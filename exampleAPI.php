@@ -8,7 +8,11 @@ $api->password='testapik2scc';
 
 //getUploadFormData
 var_dump($api->getUploadFormData());
+
+
 //get File List
-var_dump($api->getFilesList());
+$hash=$api->getFilesList();
+
+
 
 ?>
