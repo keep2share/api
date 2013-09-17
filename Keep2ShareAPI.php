@@ -5,6 +5,7 @@ class Keep2ShareAPI {
 
     protected $_ch;
     protected $_auth_token;
+    protected $_allowAuth = true;
     public $baseUrl = 'http://keep2share.cc/api/v1/';
     public $username;
     public $password;
@@ -44,20 +45,26 @@ class Keep2ShareAPI {
         }
     }
 
-    public function request($action, $params = array(), $allowAuth = true)
+    public function request($action, $params = array())
     {
         if(!$this->_auth_token) {
-            $this->login();
+            if($this->_allowAuth) {
+                $this->login();
+                $this->_allowAuth = false;
+            } else
+                return false;
         }
+
         $params['auth_token'] = $this->_auth_token;
         curl_setopt($this->_ch, CURLOPT_URL, $this->baseUrl.$action);
         curl_setopt($this->_ch, CURLOPT_POSTFIELDS, json_encode($params));
         $response = curl_exec($this->_ch);
         $data = json_decode($response, true);
         if($data['status'] == 'error' && isset($data['code']) && $data['code'] == 403) {
-            if($allowAuth) {
+            if($this->_allowAuth) {
                 $this->login();
-                return $this->request($action, $params, false);
+                $this->_allowAuth = false;
+                return $this->request($action, $params);
             } else {
                 return false;
             }
@@ -181,6 +188,33 @@ class Keep2ShareAPI {
         return $response;
     }
 
+    public function uploadFile($file)
+    {
+        if(!is_file($file))
+            throw new Exception('File not found');
+
+        $data = $this->getUploadFormData();
+        if($data['status'] == 'success') {
+            $curl = curl_init();
+
+            $postFields = $data['form_data'];
+            $postFields[$data['file_field']] = '@'.$file;
+
+            curl_setopt_array($curl, array(
+                CURLOPT_FOLLOWLOCATION => 1,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_URL => $data['form_action'],
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS =>$postFields,
+            ));
+
+            return json_decode(curl_exec($curl));
+        } else {
+            self::log('Error uploading file : ' . print_r($data, true), 'error');
+            return false;
+        }
+    }
+
 
     public static function log($msg, $level)
     {
@@ -189,16 +223,23 @@ class Keep2ShareAPI {
 
     public static function setAuthToken($key)
     {
-        $cache = new Memcache();
-        $cache->addserver('127.0.0.1');
-        $cache->set('Keep2ShareApiAuthToken', $key, 0, 1800);
+//        $cache = new Memcache();
+//        $cache->addserver('127.0.0.1');
+//        $cache->set('Keep2ShareApiAuthToken', $key, 0, 1800);
+
+        $temp_file = sys_get_temp_dir() . DIRECTORY_SEPARATOR .'k2s.api.key';
+        file_put_contents($temp_file, $key);
     }
 
     public static function getAuthToken()
     {
-        $cache = new Memcache();
-        $cache->addserver('127.0.0.1');
-        return $cache->get('Keep2ShareApiAuthToken');
+//        $cache = new Memcache();
+//        $cache->addserver('127.0.0.1');
+//        return $cache->get('Keep2ShareApiAuthToken');
+
+        $temp_file = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'k2s.api.key';
+        return is_file($temp_file)? file_get_contents($temp_file) : false;
+
     }
 
 }
