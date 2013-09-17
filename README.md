@@ -4,6 +4,15 @@ API base url: http://keep2share.cc/api/v1
 All request parameters must be encoded to JSON and sent using the POST method
 All methods return operation status (success, fail) and additional data in JSON
 
+HTTP CODES
+```
+200 - Request successful
+400 - Bad request (not correct request params)
+403 - Authorization required
+406 - Not acceptable
+```
+
+
 METHODS
 
 ```
