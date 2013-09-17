@@ -3,7 +3,7 @@
 include "Keep2ShareAPI.php";
 
 $api = new Keep2ShareAPI();
-$api->username='your_account';
+$api->username='your_email';
 $api->password='your_password';
 
 //getFilesList
