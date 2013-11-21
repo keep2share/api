@@ -21,23 +21,23 @@ Login (username, password) ->
     code: [200, 400, 403]
     auth_token: string
 
-For example:
-    curl -d '{"username":"yourbox@gmail.com","password":"yourpassword"}' http://keep2share.cc/api/v1/login
-    {"status":"success","code":200,"auth_token":"mt2dr45tlnevrjemsq34gnu121"}
+    For example:
+        request:  curl -d '{"username":"yourbox@gmail.com","password":"yourpassword"}' http://keep2share.cc/api/v1/login
+        response: {"status":"success","code":200,"auth_token":"mt2dr45tlnevrjemsq34gnu121"}
 
-auth_token must be added as param for all request methods
+    auth_token must be added as param for all request methods
 
 Test() ->
     status: [success, fail]
     status_code: [200,406]
     message: string
 
-For example:
-    curl -d '{"auth_token":"mt2dr45tlnevrjemsq34gnu121"}' http://keep2share.cc/api/v1/test
-    {"status":"success","code":200,"message":"Test was successful!"}
-
-    curl -d '{"auth_token":"---wrong_token----"}' http://keep2share.cc/api/v1/test
-    {"status":"error","code":403,"message":"Authorization session was expired"}
+    For example:
+        request:  curl -d '{"auth_token":"mt2dr45tlnevrjemsq34gnu121"}' http://keep2share.cc/api/v1/test
+        response: {"status":"success","code":200,"message":"Test was successful!"}
+    
+        request:  curl -d '{"auth_token":"---wrong_token----"}' http://keep2share.cc/api/v1/test
+        response: {"status":"error","code":403,"message":"Authorization session was expired"}
 
 
 ResellerGetCode(days, useExist = true, autoBuy = true) ->
