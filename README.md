@@ -48,15 +48,19 @@ ResellerGetCode(days, useExist = true, autoBuy = true) ->
     balance: float
 
 
-GetFilesList(parent = '/', limit = 100, offset = 0) ->
+GetFilesList(parent = '/', limit = 100, offset = 0, sort = [id=>[-1,1], name=>[-1,1], date_created=>[-1,1]]) ->
     status: [success, fail]
     status_code: [200]
     files: [
         id: int
         name: string
         is_available: bool
+        is_folder: bool
+        date_created: string
         size: int @in bytes
     ]
+ sort by id=-1 - DESC
+ sort by id=1 - ASC
 
 
 CreateFolder(name, parent ['/' or parent_id], access [public, private, premium], is_public = false) ->
