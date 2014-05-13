@@ -92,12 +92,13 @@ class Keep2ShareAPI {
         }
     }
 
-    public function getFilesList($parent = '/', $limit = 100, $offset = 0)
+    public function getFilesList($parent = '/', $limit = 100, $offset = 0, array $sort = [])
     {
         return $this->request('getFilesList', array(
             'parent'=>$parent,
             'limit'=>$limit,
             'offset'=>$offset,
+            'sort'=>$sort,
         ));
     }
 
