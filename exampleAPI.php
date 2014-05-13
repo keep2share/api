@@ -3,11 +3,11 @@
 include "Keep2ShareAPI.php";
 
 $api = new Keep2ShareAPI();
-$api->username='your_email';
-$api->password='your_password';
+$api->username='test_api@k2s.cc';
+$api->password='testapik2scc';
 
 //getFilesList
-var_dump($api->getFilesList());
+var_dump($api->getFilesList('/', 10, 0, ['date_created'=>-1]));
 /*
 array(3) {
   ["status"]=>
@@ -24,6 +24,10 @@ array(3) {
       string(9) "README.md"
       ["is_available"]=>
       bool(true)
+      ["is_folder"]=>
+      bool(false)
+      ["date_created"]=>
+      string(19) "2014-03-31 16:24:40"
       ["size"]=>
       string(4) "2857"
     }
@@ -32,7 +36,7 @@ array(3) {
 */
 
 //uploadFile
-var_dump($api->uploadFile('file_path'));
+var_dump($api->uploadFile('exampleAPI.php'));
 /*
 object(stdClass)#2 (3) {
   ["user_file_id"]=>
