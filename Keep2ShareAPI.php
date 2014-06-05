@@ -17,7 +17,7 @@ class Keep2ShareAPI {
         curl_setopt($this->_ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($this->_ch, CURLOPT_FOLLOWLOCATION, 2);
 
-        $this->_auth_token = self::getAuthToken();
+        $this->_auth_token = $this->getAuthToken();
     }
 
     public function login()
@@ -36,7 +36,7 @@ class Keep2ShareAPI {
         }
 
         if($data['status'] == 'success') {
-            self::setAuthToken($data['auth_token']);
+            $this->setAuthToken($data['auth_token']);
             $this->_auth_token = $data['auth_token'];
             return true;
         } else {
@@ -47,10 +47,13 @@ class Keep2ShareAPI {
 
     public function request($action, $params = array())
     {
-        if(!$this->_auth_token) {
+        if($this->username && !$this->_auth_token) {
             if($this->_allowAuth) {
                 $this->login();
                 $this->_allowAuth = false;
+                if(!$this->_auth_token) {
+                    return false;
+                }
             } else
                 return false;
         }
@@ -92,13 +95,14 @@ class Keep2ShareAPI {
         }
     }
 
-    public function getFilesList($parent = '/', $limit = 100, $offset = 0, array $sort = [])
+    public function getFilesList($parent = '/', $limit = 100, $offset = 0, array $sort = [], $type = 'any')
     {
         return $this->request('getFilesList', array(
             'parent'=>$parent,
             'limit'=>$limit,
             'offset'=>$offset,
             'sort'=>$sort,
+            'type'=>$type,
         ));
     }
 
@@ -115,6 +119,18 @@ class Keep2ShareAPI {
             'is_public'=>$is_public,
         ));
     }
+
+    public function updateFiles($ids = [], $new_name = null, $new_parent = null, $new_access = null, $new_is_public = null)
+    {
+        return $this->request('updateFiles', array(
+            'ids'=>$ids,
+            'new_name'=>$new_name,
+            'new_parent'=>$new_parent,
+            'new_access'=>$new_access,
+            'new_is_public'=>$new_is_public,
+        ));
+    }
+
 
     public function updateFile($id, $new_name = null, $new_parent = null, $new_access = null, $new_is_public = null)
     {
@@ -189,16 +205,17 @@ class Keep2ShareAPI {
         return $response;
     }
 
-    public function uploadFile($file)
+    public function uploadFile($file, $parent_id = null)
     {
         if(!is_file($file))
-            throw new Exception('File not found');
+            throw new Exception("File '{$file}' is not found");
 
         $data = $this->getUploadFormData();
         if($data['status'] == 'success') {
             $curl = curl_init();
 
             $postFields = $data['form_data'];
+            $postFields['parent_id'] = $parent_id;
             $postFields[$data['file_field']] = '@'.$file;
 
             curl_setopt_array($curl, array(
@@ -222,23 +239,23 @@ class Keep2ShareAPI {
         echo $msg."<br>";
     }
 
-    public static function setAuthToken($key)
+    public function setAuthToken($key)
     {
 //        $cache = new Memcache();
 //        $cache->addserver('127.0.0.1');
 //        $cache->set('Keep2ShareApiAuthToken', $key, 0, 1800);
 
-        $temp_file = sys_get_temp_dir() . DIRECTORY_SEPARATOR .'k2s.api.key';
+        $temp_file = sys_get_temp_dir() . DIRECTORY_SEPARATOR . md5($this->username) . '_k2s.api.key';
         file_put_contents($temp_file, $key);
     }
 
-    public static function getAuthToken()
+    public function getAuthToken()
     {
 //        $cache = new Memcache();
 //        $cache->addserver('127.0.0.1');
 //        return $cache->get('Keep2ShareApiAuthToken');
 
-        $temp_file = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'k2s.api.key';
+        $temp_file = sys_get_temp_dir() . DIRECTORY_SEPARATOR . md5($this->username) . '_k2s.api.key';
         return is_file($temp_file)? file_get_contents($temp_file) : false;
 
     }
