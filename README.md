@@ -10,6 +10,7 @@ HTTP CODES
 400 - Bad request (not correct request params)
 403 - Authorization required
 406 - Not acceptable
+429 - Too many requests, please wait 1 minute
 ```
 
 
