@@ -7,7 +7,7 @@ $api->username='test_api@k2s.cc';
 $api->password='testapik2scc';
 
 //getFilesList
-var_dump($api->getFilesList('/', 10, 0, ['date_created'=>-1]));
+var_dump($api->getFilesList('/', 10, 0, ['date_created'=>-1], 'files'));
 /*
 array(3) {
   ["status"]=>
