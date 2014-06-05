@@ -6,7 +6,7 @@ All methods return operation status (success, fail) and additional data in JSON
 
 HTTP CODES
 ```
-200 - Request successful
+2xx - Request successful
 400 - Bad request (not correct request params)
 403 - Authorization required
 406 - Not acceptable
@@ -48,7 +48,7 @@ ResellerGetCode(days, useExist = true, autoBuy = true) ->
     balance: float
 
 
-GetFilesList(parent = '/', limit = 100, offset = 0, sort = [id=>[-1,1], name=>[-1,1], date_created=>[-1,1]]) ->
+GetFilesList(parent = '/', limit = 100, offset = 0, sort = [id=>[-1,1], name=>[-1,1], date_created=>[-1,1]], type=>[any,file,folder]) ->
     status: [success, fail]
     status_code: [200]
     files: [
@@ -73,6 +73,14 @@ UpdateFile(id, new_name = null, new_parent = null, new_access = null, new_is_pub
     status: [success, fail]
     status_code: [202,400,406]
 
+UpdateFiles(ids[], new_name = null, new_parent = null, new_access = null, new_is_public = null) ->
+    status: [success]
+    status_code: [200]
+    files: [
+        id: string,
+        status: [success, error]
+        errors: [] @if error
+    ]
 
 GetBalance() ->
     status: [success]
@@ -115,7 +123,7 @@ FindFile(md5)
 
 
 CreateFileByHash(hash, name, parent = '/', access = public) ->
-    status: [success, fail]
+    status: [success, error]
     status_code: [201,400,406]
     id: int @if created new file
     errors: [] @if error
