@@ -233,6 +233,26 @@ class Keep2ShareAPI {
         }
     }
 
+    public function getAccountInfo()
+    {
+        return $this->request('accountInfo');
+    }
+
+    public function requestCaptcha()
+    {
+        return $this->request('requestCaptcha');
+    }
+
+    public function getUrl($id, $free_download_key = null, $captcha_challenge = null, $captcha_response = null)
+    {
+        return $this->request('getUrl', [
+            'file_id'=>$id,
+            'free_download_key'=>$free_download_key,
+            'captcha_challenge'=>$captcha_challenge,
+            'captcha_response'=>$captcha_response,
+        ]);
+    }
+
 
     public static function log($msg, $level)
     {
