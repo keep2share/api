@@ -148,10 +148,10 @@ class Keep2ShareAPI {
         return $this->request('getBalance');
     }
 
-    public function getFilesInfo(array $id)
+    public function getFilesInfo(array $ids)
     {
         return $this->request('getFilesInfo', array(
-            'ids'=>json_encode($id),
+            'ids'=>$ids,
         ));
     }
 
@@ -159,10 +159,9 @@ class Keep2ShareAPI {
     public function remoteUploadAdd(array $urls)
     {
         return $this->request('remoteUploadAdd', array(
-            'urls'=>json_encode($urls),
+            'urls'=>$urls,
         ));
     }
-
 
     const REMOTE_UPLOAD_STATUS_NEW = 1;
     const REMOTE_UPLOAD_STATUS_PROCESSING = 2;
@@ -173,7 +172,7 @@ class Keep2ShareAPI {
     public function remoteUploadStatus(array $ids)
     {
         return $this->request('remoteUploadStatus', array(
-            'ids'=>json_encode($ids),
+            'ids'=>$ids,
         ));
     }
 
@@ -205,7 +204,16 @@ class Keep2ShareAPI {
         return $response;
     }
 
-    public function uploadFile($file, $parent_id = null)
+    /**
+     * @param $file
+     * @param null $parent_id ID of existing folder
+     * @param null $parent_name Name of existing destination folder (has lower priority than parent_id)
+     * @return bool|mixed
+     * @throws Exception
+     *
+     * You can use parent_id OR parent_name for specify file folder
+     */
+    public function uploadFile($file, $parent_id = null, $parent_name = null)
     {
         if(!is_file($file))
             throw new Exception("File '{$file}' is not found");
@@ -216,6 +224,7 @@ class Keep2ShareAPI {
 
             $postFields = $data['form_data'];
             $postFields['parent_id'] = $parent_id;
+            $postFields['parent_name'] = $parent_name;
             $postFields[$data['file_field']] = '@'.$file;
 
             curl_setopt_array($curl, array(
