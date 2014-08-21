@@ -160,4 +160,49 @@ GetUploadFormData() ->
         expires: int
         hmac: string
     ]
+
+```
+
+API ERRORS
+```
+    ERROR_INCORRECT_PARAM_VALUE = 3;
+
+    ERROR_YOU_ARE_NEED_AUTHORIZED = 10;
+
+    ERROR_FILE_NOT_FOUND = 20;
+    ERROR_FILE_IS_NOT_AVAILABLE = 21;
+    ERROR_FILE_IS_BLOCKED = 22;
+
+    ERROR_CAPTCHA_REQUIRED = 30;
+    ERROR_CAPTCHA_INVALID = 31;
+
+    ERROR_WRONG_FREE_DOWNLOAD_KEY = 40;
+    ERROR_NEED_WAIT_TO_FREE_DOWNLOAD = 41;
+    ERROR_DOWNLOAD_NOT_AVAILABLE = 42;
+
+    ERROR_NO_AVAILABLE_RESELLER_CODES = 50;
+    ERROR_BUY_RESELLER_CODES = 51;
+
+    ERROR_CREATE_FOLDER = 60;
+    ERROR_UPDATE_FILE = 61;
+    ERROR_COPY_FILE = 62;
+    ERROR_NO_AVAILABLE_NODES = 63;
+
+    ERROR_INCORRECT_USERNAME_OR_PASSWORD = 70;
+    ERROR_LOGIN_ATTEMPTS_EXCEEDED = 71;
+    ERROR_ACCOUNT_BANNED = 72;
+    ERROR_NO_ALLOW_ACCESS_FROM_NETWORK = 73;
+    ERROR_UNKNOWN_LOGIN_ERROR = 74;
+
+    //billings
+    ERROR_BILLING_WRONG_ACCESS_API_KEY = 80;
+    ERROR_BILLING_TRANSACTION_NOT_FOUND = 81;
+
+    Additional download errors:
+    DOWNLOAD_COUNT_EXCEEDED = 1;     //'Download count files exceed'
+    DOWNLOAD_TRAFFIC_EXCEEDED = 2;   //'Traffic limit exceed'
+    DOWNLOAD_FILE_SIZE_EXCEEDED = 3; //"Free user can't download large files. Upgrate to PREMIUM and forget about limits."
+    DOWNLOAD_NO_ACCESS = 4;          //'You no can access to this file'
+    DOWNLOAD_WAITING = 5;            //'Please wait to download this file'
+    DOWNLOAD_FREE_THREAD_COUNT_TO_MANY = 6; //'Free account does not allow to download more than one file at the same time'
 ```
