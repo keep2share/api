@@ -116,6 +116,7 @@ GetFilesInfo(ids[]) ->
         name: string
         size int
         is_available: bool
+        access: ['public', 'private', 'premium']
         is_folder: bool
         md5: string
     ]
