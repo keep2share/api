@@ -116,6 +116,7 @@ GetFilesInfo(ids[]) ->
         name: string
         size int
         is_available: bool
+        is_folder: bool
         md5: string
     ]
 
@@ -205,4 +206,6 @@ API ERRORS
     DOWNLOAD_NO_ACCESS = 4;          //'You no can access to this file'
     DOWNLOAD_WAITING = 5;            //'Please wait to download this file'
     DOWNLOAD_FREE_THREAD_COUNT_TO_MANY = 6; //'Free account does not allow to download more than one file at the same time'
+    PREMIUM_ONLY = 7;                //'This download available only for premium users',
+    PRIVATE_ONLY = 8;                //'This is private file',
 ```
