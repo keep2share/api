@@ -17,9 +17,9 @@ HTTP CODES
 METHODS
 
 ```
-Login (username, password) ->
+Login (username, password, captcha_challenge = null, captcha_response = null) ->
     status_code: [success, fail]
-    code: [200, 400, 403]
+    code: [200, 400, 403, 406]
     auth_token: string
 
     For example:
