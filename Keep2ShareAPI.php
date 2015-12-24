@@ -3,12 +3,51 @@
 
 class Keep2ShareAPI {
 
+    const ERROR_INCORRECT_PARAMS = 2;
+    const ERROR_INCORRECT_PARAM_VALUE = 3;
+    const ERROR_INVALID_REQUEST = 4;
+
+    const ERROR_YOU_ARE_NEED_AUTHORIZED = 10;
+    const ERROR_AUTHORIZATION_EXPIRED = 11;
+
+    const ERROR_FILE_NOT_FOUND = 20;
+    const ERROR_FILE_IS_NOT_AVAILABLE = 21;
+    const ERROR_FILE_IS_BLOCKED = 22;
+    const ERROR_DOWNLOAD_FOLDER_NOT_SUPPORTED = 23;
+
+    const ERROR_CAPTCHA_REQUIRED = 30;
+    const ERROR_CAPTCHA_INVALID = 31;
+
+    const ERROR_WRONG_FREE_DOWNLOAD_KEY = 40;
+    const ERROR_NEED_WAIT_TO_FREE_DOWNLOAD = 41;
+    const ERROR_DOWNLOAD_NOT_AVAILABLE = 42;
+    const ERROR_DOWNLOAD_PREMIUM_ONLY = 43;
+
+    const ERROR_NO_AVAILABLE_RESELLER_CODES = 50;
+    const ERROR_BUY_RESELLER_CODES = 51;
+
+    const ERROR_CREATE_FOLDER = 60;
+    const ERROR_UPDATE_FILE = 61;
+    const ERROR_COPY_FILE = 62;
+    const ERROR_NO_AVAILABLE_NODES = 63;
+    const ERROR_DISK_SPACE_EXCEED = 64;
+
+    const ERROR_INCORRECT_USERNAME_OR_PASSWORD = 70;
+    const ERROR_LOGIN_ATTEMPTS_EXCEEDED = 71;
+    const ERROR_ACCOUNT_BANNED = 72;
+    const ERROR_NO_ALLOW_ACCESS_FROM_NETWORK = 73;
+    const ERROR_UNKNOWN_LOGIN_ERROR = 74;
+    const ERROR_ILLEGAL_SESSION_IP = 75;
+    const ERROR_ACCOUNT_STOLEN = 76;
+    const ERROR_NETWORK_BANNED = 77;
+
     protected $_ch;
     protected $_auth_token;
     protected $_allowAuth = true;
-    public $baseUrl = 'http://keep2share.cc/api/v1/';
+    public $baseUrl = 'http://keep2share.cc/api/v2/';
     public $username;
     public $password;
+    public $verbose = false;
 
     public function __construct()
     {
@@ -20,15 +59,35 @@ class Keep2ShareAPI {
         $this->_auth_token = $this->getAuthToken();
     }
 
-    public function login()
+    /**
+     * @param null $captcha_challenge
+     * @param null $captcha_response
+     * @return bool|int True if success login or error code
+     */
+    public function login($captcha_challenge = null, $captcha_response = null)
     {
         curl_setopt($this->_ch, CURLOPT_URL, $this->baseUrl.'login');
-        curl_setopt($this->_ch, CURLOPT_POSTFIELDS, json_encode(array(
+
+        $params = [
             'username'=>$this->username,
             'password'=>$this->password,
-        )));
+        ];
 
-        $data = json_decode(curl_exec($this->_ch), true);
+        if($captcha_challenge)
+            $params['captcha_challenge'] = $captcha_challenge;
+
+        if($captcha_response)
+            $params['captcha_response'] = $captcha_response;
+
+        curl_setopt($this->_ch, CURLOPT_POSTFIELDS, json_encode($params));
+        $response = curl_exec($this->_ch);
+
+        if($this->verbose) {
+            echo '>> ' . json_encode($params), "\n";
+            echo '<< ' . $response, "\n";
+            echo "-------------------------\n";
+        }
+        $data = json_decode($response, true);
 
         if(!$data || !isset($data['status'])) {
             self::log('Authentication failed', 'warning');
@@ -41,27 +100,26 @@ class Keep2ShareAPI {
             return true;
         } else {
             self::log('Authentication failed: ' . $data['message'], 'warning');
-            return false;
+            return $data['errorCode'];
         }
     }
 
     public function request($action, $params = array())
     {
-        if($this->username && !$this->_auth_token) {
-            if($this->_allowAuth) {
-                $this->login();
-                $this->_allowAuth = false;
-                if(!$this->_auth_token) {
-                    return false;
-                }
-            } else
-                return false;
+        if($this->_auth_token) {
+            $params['auth_token'] = $this->_auth_token;
         }
 
-        $params['auth_token'] = $this->_auth_token;
         curl_setopt($this->_ch, CURLOPT_URL, $this->baseUrl.$action);
         curl_setopt($this->_ch, CURLOPT_POSTFIELDS, json_encode($params));
         $response = curl_exec($this->_ch);
+
+        if($this->verbose) {
+            echo '>> ' . json_encode($params), "\n";
+            echo '<< ' . $response, "\n";
+            echo "-------------------------\n";
+        }
+
         $data = json_decode($response, true);
         if($data['status'] == 'error' && isset($data['code']) && $data['code'] == 403) {
             if($this->_allowAuth) {
@@ -193,9 +251,9 @@ class Keep2ShareAPI {
         ));
     }
 
-    public function getUploadFormData()
+    public function getUploadFormData($parent_id)
     {
-        return $this->request('getUploadFormData');
+        return $this->request('getUploadFormData', ['parent_id' => $parent_id]);
     }
 
     public function test()
@@ -213,29 +271,29 @@ class Keep2ShareAPI {
      *
      * You can use parent_id OR parent_name for specify file folder
      */
-    public function uploadFile($file, $parent_id = null, $parent_name = null)
+    public function uploadFile($file, $parent_id = null)
     {
         if(!is_file($file))
             throw new Exception("File '{$file}' is not found");
 
-        $data = $this->getUploadFormData();
+        $data = $this->getUploadFormData($parent_id);
         if($data['status'] == 'success') {
             $curl = curl_init();
 
             $postFields = $data['form_data'];
-            $postFields['parent_id'] = $parent_id;
-            $postFields['parent_name'] = $parent_name;
-            $postFields[$data['file_field']] = '@'.$file;
+            $postFields[$data['file_field']] = new CURLFile($file, '', basename(__FILE__));
 
             curl_setopt_array($curl, array(
-                CURLOPT_FOLLOWLOCATION => 1,
+                CURLOPT_FOLLOWLOCATION => false,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_URL => $data['form_action'],
                 CURLOPT_POST => true,
                 CURLOPT_POSTFIELDS =>$postFields,
             ));
 
-            return json_decode(curl_exec($curl));
+            $response = curl_exec($curl);
+            if($this->verbose) echo '<<', $response, "\n";
+            return json_decode($response);
         } else {
             self::log('Error uploading file : ' . print_r($data, true), 'error');
             return false;
@@ -252,20 +310,32 @@ class Keep2ShareAPI {
         return $this->request('requestCaptcha');
     }
 
-    public function getUrl($id, $free_download_key = null, $captcha_challenge = null, $captcha_response = null)
+    public function getUrl($file_id, $free_download_key = null, $captcha_challenge = null, $captcha_response = null)
     {
         return $this->request('getUrl', [
-            'file_id'=>$id,
+            'file_id'=>$file_id,
             'free_download_key'=>$free_download_key,
             'captcha_challenge'=>$captcha_challenge,
             'captcha_response'=>$captcha_response,
         ]);
     }
 
+    public function search($keywords, $operator = 'or', $sort = 'score',
+                           $limit = 20, $offset = 0, $ip_client = null)
+    {
+        return $this->request('search', [
+            'keywords' => $keywords,
+            'operator' => $operator,
+            'sort' => $sort,
+            'limit' => $limit,
+            'offset' => $offset,
+            'ip_client' => $ip_client,
+        ]);
+    }
 
     public static function log($msg, $level)
     {
-        echo $msg."<br>";
+        echo $msg."\n";
     }
 
     public function setAuthToken($key)
