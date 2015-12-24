@@ -1,4 +1,4 @@
-API base url: http://keep2share.cc/api/v1
+API base url: http://keep2share.cc/api/v2
 
 
 All request parameters must be encoded to JSON and sent using the POST method
@@ -23,7 +23,7 @@ Login (username, password, captcha_challenge = null, captcha_response = null) ->
     auth_token: string
 
     For example:
-        request:  curl -d '{"username":"yourbox@gmail.com","password":"yourpassword"}' http://keep2share.cc/api/v1/login
+        request:  curl -d '{"username":"yourbox@gmail.com","password":"yourpassword"}' http://keep2share.cc/api/v2/login
         response: {"status":"success","code":200,"auth_token":"mt2dr45tlnevrjemsq34gnu121"}
 
     auth_token must be added as param for all request methods
@@ -34,10 +34,10 @@ Test() ->
     message: string
 
     For example:
-        request:  curl -d '{"auth_token":"mt2dr45tlnevrjemsq34gnu121"}' http://keep2share.cc/api/v1/test
+        request:  curl -d '{"auth_token":"mt2dr45tlnevrjemsq34gnu121"}' http://keep2share.cc/api/v2/test
         response: {"status":"success","code":200,"message":"Test was successful!"}
     
-        request:  curl -d '{"auth_token":"---wrong_token----"}' http://keep2share.cc/api/v1/test
+        request:  curl -d '{"auth_token":"---wrong_token----"}' http://keep2share.cc/api/v2/test
         response: {"status":"error","code":403,"message":"Authorization session was expired"}
 
 
