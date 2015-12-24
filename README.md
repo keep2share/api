@@ -157,10 +157,8 @@ GetUploadFormData() ->
     form_action: string
     file_field: string
     form_data: [
-        nodeName: string
-        userId: int
-        expires: int
-        hmac: string
+        params: string
+        signature: string
     ]
 
 ```
