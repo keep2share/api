@@ -265,7 +265,6 @@ class Keep2ShareAPI {
     /**
      * @param $file
      * @param null $parent_id ID of existing folder
-     * @param null $parent_name Name of existing destination folder (has lower priority than parent_id)
      * @return bool|mixed
      * @throws Exception
      *
@@ -281,7 +280,7 @@ class Keep2ShareAPI {
             $curl = curl_init();
 
             $postFields = $data['form_data'];
-            $postFields[$data['file_field']] = new CURLFile($file, '', basename(__FILE__));
+            $postFields[$data['file_field']] = new CURLFile($file);
 
             curl_setopt_array($curl, array(
                 CURLOPT_FOLLOWLOCATION => false,
