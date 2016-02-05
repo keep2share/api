@@ -221,6 +221,13 @@ class Keep2ShareAPI {
         ));
     }
 
+    public function deleteFiles(array  $ids)
+    {
+        return $this->request('deleteFiles', array(
+            'ids' => $ids,
+        ));
+    }
+
     const REMOTE_UPLOAD_STATUS_NEW = 1;
     const REMOTE_UPLOAD_STATUS_PROCESSING = 2;
     const REMOTE_UPLOAD_STATUS_COMPLETED = 3;
@@ -251,9 +258,9 @@ class Keep2ShareAPI {
         ));
     }
 
-    public function getUploadFormData($parent_id)
+    public function getUploadFormData($parent_id = null, $preferred_node = null)
     {
-        return $this->request('getUploadFormData', ['parent_id' => $parent_id]);
+        return $this->request('getUploadFormData', ['parent_id' => $parent_id, 'preferred_node' => $preferred_node]);
     }
 
     public function test()
