@@ -36,7 +36,7 @@ Test() ->
     For example:
         request:  curl -d '{"auth_token":"mt2dr45tlnevrjemsq34gnu121"}' http://keep2share.cc/api/v2/test
         response: {"status":"success","code":200,"message":"Test was successful!"}
-    
+
         request:  curl -d '{"auth_token":"---wrong_token----"}' http://keep2share.cc/api/v2/test
         response: {"status":"error","code":403,"message":"Authorization session was expired"}
 
@@ -151,15 +151,21 @@ CreateFileByHash(hash, name, parent = '/', access = public) ->
     errors: [] @if error
 
 
-GetUploadFormData() ->
+GetUploadFormData(parent_id = null, preferred_node = null) ->
     status: [success]
-    status_code: [200]
+    status_code: [200,400]
     form_action: string
     file_field: string
     form_data: [
         params: string
         signature: string
     ]
+
+DeleteFiles(ids[]) ->
+    status: [success]
+    status_code: [200]
+    deleted: int @count of deleted files
+
 
 ```
 
