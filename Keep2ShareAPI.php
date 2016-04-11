@@ -208,10 +208,11 @@ class Keep2ShareAPI {
         return $this->request('getBalance');
     }
 
-    public function getFilesInfo(array $ids)
+    public function getFilesInfo(array $ids, $extended_info = false)
     {
         return $this->request('getFilesInfo', array(
             'ids'=>$ids,
+            'extended_info' => $extended_info,
         ));
     }
 
