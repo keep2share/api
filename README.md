@@ -108,7 +108,7 @@ GetBalance() ->
     balance: float
 
 
-GetFilesInfo(ids[]) ->
+GetFilesInfo(ids[], extended_info = false) ->
     status: [success]
     status_code: [200,400]
     files: [
@@ -119,6 +119,9 @@ GetFilesInfo(ids[]) ->
         access: ['public', 'private', 'premium']
         is_folder: bool
         md5: string
+        extended_info: [
+            delete_reasons: []
+        ]
     ]
 
 
