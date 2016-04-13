@@ -68,7 +68,11 @@ ResellerGetCode(days, useExist = true, autoBuy = true) ->
     balance: float
 
 
-GetFilesList(parent = '/', limit = 100, offset = 0, sort = [id=>[-1,1], name=>[-1,1], date_created=>[-1,1]], type=>[any,file,folder], only_available = false) ->
+GetFilesList(
+    parent = '/', limit = 100, offset = 0, sort = [id=>[-1,1], 
+    name=>[-1,1], date_created=>[-1,1]], type=>[any,file,folder], 
+    only_available = false, extended_info = false
+) ->
     status: [success, fail]
     status_code: [200]
     files: [
