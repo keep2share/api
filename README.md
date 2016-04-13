@@ -82,6 +82,10 @@ GetFilesList(
         is_folder: bool
         date_created: string
         size: int @in bytes
+        extended_info: [
+            abuses: []
+            object_status: string
+        ]
     ]
  sort by id=-1 - DESC
  sort by id=1 - ASC
@@ -124,7 +128,8 @@ GetFilesInfo(ids[], extended_info = false) ->
         is_folder: bool
         md5: string
         extended_info: [
-            delete_reasons: []
+            abuses: []
+            object_status: string
         ]
     ]
 
