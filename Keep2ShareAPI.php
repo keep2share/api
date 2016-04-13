@@ -154,7 +154,7 @@ class Keep2ShareAPI {
     }
 
     public function getFilesList($parent = '/', $limit = 100, $offset = 0, array $sort = [], $type = 'any',
-                                 $only_available = false)
+                                 $only_available = false, $extended_info = false)
     {
         return $this->request('getFilesList', array(
             'parent'=>$parent,
@@ -163,6 +163,7 @@ class Keep2ShareAPI {
             'sort'=>$sort,
             'type'=>$type,
             'only_available' => $only_available,
+            'extended_info' => $extended_info,
         ));
     }
 
