@@ -84,7 +84,12 @@ GetFilesList(
         size: int @in bytes
         extended_info: [
             abuses: []
-            object_status: string
+            storage_object: [available|deleted|corrupted]
+            size: int
+            date_download_last: string
+            downloads: int
+            access: string
+            content_type: string
         ]
     ]
  sort by id=-1 - DESC
@@ -129,7 +134,12 @@ GetFilesInfo(ids[], extended_info = false) ->
         md5: string
         extended_info: [
             abuses: []
-            object_status: string
+            storage_object: [available|deleted|corrupted]
+            size: int
+            date_download_last: string
+            downloads: int
+            access: string
+            content_type: string
         ]
     ]
 
