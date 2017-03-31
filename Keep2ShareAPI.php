@@ -276,17 +276,16 @@ class Keep2ShareAPI {
     /**
      * @param $file
      * @param null $parent_id ID of existing folder
+     * @param null $preferred_node
      * @return bool|mixed
-     * @throws Exception
-     *
-     * You can use parent_id OR parent_name for specify file folder
+     * @throws Exception You can use parent_id OR parent_name for specify file folder
      */
-    public function uploadFile($file, $parent_id = null)
+    public function uploadFile($file, $parent_id = null, $preferred_node = null)
     {
         if(!is_file($file))
             throw new Exception("File '{$file}' is not found");
 
-        $data = $this->getUploadFormData($parent_id);
+        $data = $this->getUploadFormData($parent_id, $preferred_node);
         if($data['status'] == 'success') {
             $curl = curl_init();
 
