@@ -1,8 +1,12 @@
 <?php
 
-
-class Keep2ShareAPI {
-
+/**
+ * Class Keep2ShareAPI
+ *
+ * Version: 2.0
+ */
+class Keep2ShareAPI
+{
     const ERROR_INCORRECT_PARAMS = 2;
     const ERROR_INCORRECT_PARAM_VALUE = 3;
     const ERROR_INVALID_REQUEST = 4;
@@ -41,16 +45,39 @@ class Keep2ShareAPI {
     const ERROR_ACCOUNT_STOLEN = 76;
     const ERROR_NETWORK_BANNED = 77;
 
+    const FILE_ACCESS_PUBLIC = 'public';
+    const FILE_ACCESS_PRIVATE = 'private';
+    const FILE_ACCESS_PREMIUM = 'premium';
+
+    const REMOTE_UPLOAD_STATUS_NEW = 1;
+    const REMOTE_UPLOAD_STATUS_PROCESSING = 2;
+    const REMOTE_UPLOAD_STATUS_COMPLETED = 3;
+    const REMOTE_UPLOAD_STATUS_ERROR = 4;
+    const REMOTE_UPLOAD_STATUS_ACCEPTED = 5;
+
+    const CHUNK_HASH_SIZE = 5242880;
+
     protected $_ch;
     protected $_auth_token;
     protected $_allowAuth = true;
-    public $baseUrl = 'http://keep2share.cc/api/v2/';
-    public $username;
-    public $password;
+
+    public $baseUrl = 'https://keep2share.cc/api/v2/';
+    public $fileServer = 'https://keep2share.cc/file/';
+    private $username = '';
+    private $password = '';
     public $verbose = false;
 
-    public function __construct()
+    /**
+     * Keep2ShareAPI constructor.
+     *
+     * @param string $username
+     * @param string $password
+     */
+    public function __construct($username = '', $password = '')
     {
+        $this->username = $username;
+        $this->password = $password;
+
         $this->_ch = curl_init();
         curl_setopt($this->_ch, CURLOPT_POST, true);
         curl_setopt($this->_ch, CURLOPT_RETURNTRANSFER, true);
@@ -66,35 +93,35 @@ class Keep2ShareAPI {
      */
     public function login($captcha_challenge = null, $captcha_response = null)
     {
-        curl_setopt($this->_ch, CURLOPT_URL, $this->baseUrl.'login');
+        curl_setopt($this->_ch, CURLOPT_URL, $this->baseUrl . 'login');
 
         $params = [
-            'username'=>$this->username,
-            'password'=>$this->password,
+            'username' => $this->username,
+            'password' => $this->password,
         ];
 
-        if($captcha_challenge)
+        if ($captcha_challenge)
             $params['captcha_challenge'] = $captcha_challenge;
 
-        if($captcha_response)
+        if ($captcha_response)
             $params['captcha_response'] = $captcha_response;
 
         curl_setopt($this->_ch, CURLOPT_POSTFIELDS, json_encode($params));
         $response = curl_exec($this->_ch);
 
-        if($this->verbose) {
-            echo '>> ' . json_encode($params), "\n";
-            echo '<< ' . $response, "\n";
-            echo "-------------------------\n";
+        if ($this->verbose) {
+            echo '>> ' . json_encode($params), PHP_EOL;
+            echo '<< ' . $response, PHP_EOL;
+            echo '-------------------------' . PHP_EOL;
         }
         $data = json_decode($response, true);
 
-        if(!$data || !isset($data['status'])) {
+        if (!$data || !isset($data['status'])) {
             self::log('Authentication failed', 'warning');
             return false;
         }
 
-        if($data['status'] == 'success') {
+        if ($data['status'] == 'success') {
             $this->setAuthToken($data['auth_token']);
             $this->_auth_token = $data['auth_token'];
             return true;
@@ -104,25 +131,32 @@ class Keep2ShareAPI {
         }
     }
 
+    /**
+     * Make request
+     *
+     * @param $action
+     * @param array $params
+     * @return bool|mixed
+     */
     public function request($action, $params = array())
     {
-        if($this->_auth_token) {
+        if ($this->_auth_token) {
             $params['auth_token'] = $this->_auth_token;
         }
 
-        curl_setopt($this->_ch, CURLOPT_URL, $this->baseUrl.$action);
+        curl_setopt($this->_ch, CURLOPT_URL, $this->baseUrl . $action);
         curl_setopt($this->_ch, CURLOPT_POSTFIELDS, json_encode($params));
         $response = curl_exec($this->_ch);
 
-        if($this->verbose) {
-            echo '>> ' . json_encode($params), "\n";
-            echo '<< ' . $response, "\n";
-            echo "-------------------------\n";
+        if ($this->verbose) {
+            echo '>> ' . json_encode($params), PHP_EOL;
+            echo '<< ' . $response, PHP_EOL;
+            echo '-------------------------' . PHP_EOL;
         }
 
         $data = json_decode($response, true);
-        if($data['status'] == 'error' && isset($data['code']) && $data['code'] == 403) {
-            if($this->_allowAuth) {
+        if ($data['status'] == 'error' && isset($data['code']) && $data['code'] == 403) {
+            if ($this->_allowAuth) {
                 $this->login();
                 $this->_allowAuth = false;
                 return $this->request($action, $params);
@@ -133,17 +167,16 @@ class Keep2ShareAPI {
         return $data;
     }
 
-
     public function getCode($days, $autoBuy = true, $useExist = true)
     {
         $data = $this->request('resellerGetCode', array(
-            'days'=>$days,
-            'autoBuy'=>$autoBuy,
-            'useExist'=>$useExist,
+            'days' => $days,
+            'autoBuy' => $autoBuy,
+            'useExist' => $useExist,
         ));
-        if(!isset($data['status']) || $data['status'] != 'success') {
+        if (!isset($data['status']) || $data['status'] != 'success') {
             $err = 'Error get code';
-            if(isset($data['message'])) {
+            if (isset($data['message'])) {
                 $err .= ' :' . $data['message'];
             }
             self::log($err, 'warning');
@@ -157,50 +190,45 @@ class Keep2ShareAPI {
                                  $only_available = false, $extended_info = false)
     {
         return $this->request('getFilesList', array(
-            'parent'=>$parent,
-            'limit'=>$limit,
-            'offset'=>$offset,
-            'sort'=>$sort,
-            'type'=>$type,
+            'parent' => $parent,
+            'limit' => $limit,
+            'offset' => $offset,
+            'sort' => $sort,
+            'type' => $type,
             'only_available' => $only_available,
             'extended_info' => $extended_info,
         ));
     }
 
-    const FILE_ACCESS_PUBLIC = 'public';
-    const FILE_ACCESS_PRIVATE = 'private';
-    const FILE_ACCESS_PREMIUM = 'premium';
-
     public function createFolder($name, $parent = '/', $access = Keep2ShareAPI::FILE_ACCESS_PUBLIC, $is_public = false)
     {
         return $this->request('createFolder', array(
-            'name'=>$name,
-            'parent'=>$parent,
-            'access'=>$access,
-            'is_public'=>$is_public,
+            'name' => $name,
+            'parent' => $parent,
+            'access' => $access,
+            'is_public' => $is_public,
         ));
     }
 
     public function updateFiles($ids = [], $new_name = null, $new_parent = null, $new_access = null, $new_is_public = null)
     {
         return $this->request('updateFiles', array(
-            'ids'=>$ids,
-            'new_name'=>$new_name,
-            'new_parent'=>$new_parent,
-            'new_access'=>$new_access,
-            'new_is_public'=>$new_is_public,
+            'ids' => $ids,
+            'new_name' => $new_name,
+            'new_parent' => $new_parent,
+            'new_access' => $new_access,
+            'new_is_public' => $new_is_public,
         ));
     }
-
 
     public function updateFile($id, $new_name = null, $new_parent = null, $new_access = null, $new_is_public = null)
     {
         return $this->request('updateFile', array(
-            'id'=>$id,
-            'new_name'=>$new_name,
-            'new_parent'=>$new_parent,
-            'new_access'=>$new_access,
-            'new_is_public'=>$new_is_public,
+            'id' => $id,
+            'new_name' => $new_name,
+            'new_parent' => $new_parent,
+            'new_access' => $new_access,
+            'new_is_public' => $new_is_public,
         ));
     }
 
@@ -212,53 +240,46 @@ class Keep2ShareAPI {
     public function getFilesInfo(array $ids, $extended_info = false)
     {
         return $this->request('getFilesInfo', array(
-            'ids'=>$ids,
+            'ids' => $ids,
             'extended_info' => $extended_info,
         ));
     }
 
-
     public function remoteUploadAdd(array $urls)
     {
         return $this->request('remoteUploadAdd', array(
-            'urls'=>$urls,
+            'urls' => $urls,
         ));
     }
 
-    public function deleteFiles(array  $ids)
+    public function deleteFiles(array $ids)
     {
         return $this->request('deleteFiles', array(
             'ids' => $ids,
         ));
     }
 
-    const REMOTE_UPLOAD_STATUS_NEW = 1;
-    const REMOTE_UPLOAD_STATUS_PROCESSING = 2;
-    const REMOTE_UPLOAD_STATUS_COMPLETED = 3;
-    const REMOTE_UPLOAD_STATUS_ERROR = 4;
-    const REMOTE_UPLOAD_STATUS_ACCEPTED = 5;
-
     public function remoteUploadStatus(array $ids)
     {
         return $this->request('remoteUploadStatus', array(
-            'ids'=>$ids,
+            'ids' => $ids,
         ));
     }
 
     public function findFile($md5)
     {
         return $this->request('findFile', array(
-            'md5'=>$md5,
+            'md5' => $md5,
         ));
     }
 
     public function createFileByHash($md5, $name, $parent = '/', $access = Keep2ShareAPI::FILE_ACCESS_PUBLIC)
     {
         return $this->request('createFileByHash', array(
-            'hash'=>$md5,
-            'name'=>$name,
-            'parent'=>$parent,
-            'access'=>$access,
+            'hash' => $md5,
+            'name' => $name,
+            'parent' => $parent,
+            'access' => $access,
         ));
     }
 
@@ -280,13 +301,13 @@ class Keep2ShareAPI {
      * @return bool|mixed
      * @throws Exception You can use parent_id OR parent_name for specify file folder
      */
-    public function uploadFile($file, $parent_id = null, $preferred_node = null)
+    private function uploadFile($file, $parent_id = null, $preferred_node = null)
     {
-        if(!is_file($file))
+        if (!is_file($file))
             throw new Exception("File '{$file}' is not found");
 
         $data = $this->getUploadFormData($parent_id, $preferred_node);
-        if($data['status'] == 'success') {
+        if ($data['status'] == 'success') {
             $curl = curl_init();
 
             $postFields = $data['form_data'];
@@ -297,11 +318,11 @@ class Keep2ShareAPI {
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_URL => $data['form_action'],
                 CURLOPT_POST => true,
-                CURLOPT_POSTFIELDS =>$postFields,
+                CURLOPT_POSTFIELDS => $postFields,
             ));
 
             $response = curl_exec($curl);
-            if($this->verbose) echo '<<', $response, "\n";
+            if ($this->verbose) echo '<<', $response, PHP_EOL;
             return json_decode($response);
         } else {
             self::log('Error uploading file : ' . print_r($data, true), 'error');
@@ -322,10 +343,10 @@ class Keep2ShareAPI {
     public function getUrl($file_id, $free_download_key = null, $captcha_challenge = null, $captcha_response = null)
     {
         return $this->request('getUrl', [
-            'file_id'=>$file_id,
-            'free_download_key'=>$free_download_key,
-            'captcha_challenge'=>$captcha_challenge,
-            'captcha_response'=>$captcha_response,
+            'file_id' => $file_id,
+            'free_download_key' => $free_download_key,
+            'captcha_challenge' => $captcha_challenge,
+            'captcha_response' => $captcha_response,
         ]);
     }
 
@@ -342,12 +363,12 @@ class Keep2ShareAPI {
         ]);
     }
 
-    public static function log($msg, $level)
+    public static function log($msg, $level = 0)
     {
-        echo $msg."\n";
+        echo $msg . PHP_EOL;
     }
 
-    public function setAuthToken($key)
+    private function setAuthToken($key)
     {
 //        $cache = new Memcache();
 //        $cache->addserver('127.0.0.1');
@@ -357,15 +378,123 @@ class Keep2ShareAPI {
         file_put_contents($temp_file, $key);
     }
 
-    public function getAuthToken()
+    private function getAuthToken()
     {
 //        $cache = new Memcache();
 //        $cache->addserver('127.0.0.1');
 //        return $cache->get('Keep2ShareApiAuthToken');
 
         $temp_file = sys_get_temp_dir() . DIRECTORY_SEPARATOR . md5($this->username) . '_k2s.api.key';
-        return is_file($temp_file)? file_get_contents($temp_file) : false;
-
+        return is_file($temp_file) ? file_get_contents($temp_file) : false;
     }
 
+    /**
+     * Return File Link
+     *
+     * @param string $fileID
+     * @return string
+     */
+    private function getLink($fileID = '')
+    {
+        return $this->fileServer . $fileID;
+    }
+
+    /**
+     * Get SHA1 by first 5MB of the file
+     *
+     * @throws Exception
+     * @param string $filePath
+     * @return string
+     */
+    private function getFileSha1Hash($filePath)
+    {
+        // Check file for existence
+        if (!file_exists($filePath)) {
+            throw new Exception('File not found');
+        }
+
+        try {
+            // Read the file
+            $handle = fopen($filePath, 'r');
+            $fileChunk = fread($handle, self::CHUNK_HASH_SIZE);
+            fclose($handle);
+        } catch (Exception $exception) {
+            throw new Exception('Can\'t read the file');
+        }
+
+        return sha1($fileChunk);
+    }
+
+    /**
+     * Make a request and check file existence by sha1([FILE_FIRST_5_MB])
+     *
+     * Annotation:
+     * 1. Read the first 5 megabytes from your file
+     * 2. Convert this data into sha1 algorithm
+     *
+     * @param string $sha1
+     * @return array|null
+     */
+    private function findBySha1Hash($sha1)
+    {
+        return $this->request('findByFirst5MbSha1Hash', [
+            'sha1' => $sha1,
+        ]);
+    }
+
+    /**
+     * Make a request and check file existence by md5([FILE])
+     *
+     * Annotation:
+     * 1. Read the file
+     * 2. Convert this data into md5 algorithm
+     *
+     * @param string $md5
+     * @return bool
+     */
+    private function findByMd5Hash($md5)
+    {
+        return $this->request('findByFullMd5Hash', [
+            'md5' => $md5,
+        ]);
+    }
+
+    /**
+     * Upload file method
+     *
+     * @throws Exception
+     * @param string $filePath
+     * @param string $fileName
+     * @return string
+     */
+    public function autoUploader($filePath, $fileName = '')
+    {
+        if ($fileName == '') {
+            $fileName = basename($filePath);
+        }
+        $sha1 = $this->getFileSha1Hash($filePath);
+        $sha1FindResult = $this->findBySha1Hash($sha1);
+
+        if (!isset($sha1FindResult['found'])) {
+            throw new Exception('Incorrect params, expected "found" parameter');
+        }
+
+        if ($sha1FindResult['found']) {
+            $md5 = md5_file($filePath);
+            $md5FindResult = $this->findByMd5Hash($md5);
+            if (!isset($md5FindResult['found'])) {
+                throw new Exception('Incorrect params, expectation "found" parameter');
+            }
+            if (!$md5FindResult['found']) {
+                $uploadStatus = $this->uploadFile($filePath);
+                return $uploadStatus->link;
+            } else {
+                $createdFile = $this->createFileByHash($md5FindResult['md5'], $fileName);
+                return $this->getLink($createdFile['id']);
+            }
+        } else {
+            $uploadStatus = $this->uploadFile($filePath);
+            return $uploadStatus->link;
+        }
+    }
 }
