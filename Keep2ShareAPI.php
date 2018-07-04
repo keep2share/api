@@ -301,7 +301,7 @@ class Keep2ShareAPI
      * @return bool|mixed
      * @throws Exception You can use parent_id OR parent_name for specify file folder
      */
-    private function uploadFile($file, $parent_id = null, $preferred_node = null)
+    public function uploadFile($file, $parent_id = null, $preferred_node = null)
     {
         if (!is_file($file))
             throw new Exception("File '{$file}' is not found");
@@ -467,11 +467,8 @@ class Keep2ShareAPI
      * @param string $fileName
      * @return string
      */
-    public function autoUploader($filePath, $fileName = '')
+    public function autoUploader($filePath, $fileName = null)
     {
-        if ($fileName == '') {
-            $fileName = basename($filePath);
-        }
         $sha1 = $this->getFileSha1Hash($filePath);
         $sha1FindResult = $this->findBySha1Hash($sha1);
 
@@ -485,16 +482,12 @@ class Keep2ShareAPI
             if (!isset($md5FindResult['found'])) {
                 throw new Exception('Incorrect params, expectation "found" parameter');
             }
-            if (!$md5FindResult['found']) {
-                $uploadStatus = $this->uploadFile($filePath);
-                return $uploadStatus->link;
-            } else {
-                $createdFile = $this->createFileByHash($md5FindResult['md5'], $fileName);
+            if ($md5FindResult['found']) {
+                $createdFile = $this->createFileByHash($md5FindResult['md5'], $fileName ?? basename($filePath));
                 return $this->getLink($createdFile['id']);
             }
-        } else {
-            $uploadStatus = $this->uploadFile($filePath);
-            return $uploadStatus->link;
         }
+        $uploadStatus = $this->uploadFile($filePath);
+        return $uploadStatus->link;
     }
 }
