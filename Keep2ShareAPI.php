@@ -60,11 +60,10 @@ class Keep2ShareAPI
     protected $_ch;
     protected $_auth_token;
     protected $_allowAuth = true;
-
-    public $baseUrl = 'https://keep2share.cc/api/v2/';
-    public $fileServer = 'https://keep2share.cc/file/';
-    private $username = '';
-    private $password = '';
+    public $baseUrl = 'http://keep2share.cc/api/v2/';
+    public $username;
+    public $password;
+    public $access_token;
     public $verbose = false;
 
     /**
@@ -140,7 +139,15 @@ class Keep2ShareAPI
      */
     public function request($action, $params = array())
     {
-        if ($this->_auth_token) {
+        if ($this->access_token) {
+            if (!(empty($this->username) && empty($this->password))) {
+                self::log('You can not simultaneously use the token and login/password per request', 'warning');
+                return false;
+            }
+            $params['access_token'] = $this->access_token;
+        }
+
+        if($this->_auth_token) {
             $params['auth_token'] = $this->_auth_token;
         }
 
@@ -303,8 +310,33 @@ class Keep2ShareAPI
      */
     public function uploadFile($file, $parent_id = null, $preferred_node = null)
     {
-        if (!is_file($file))
+        if (!is_file($file)) {
             throw new Exception("File '{$file}' is not found");
+        }
+
+        $sha1 = $this->getFirst5MbFileSha1Hash($file);
+        $sha1FindResult = $this->findBySha1Hash($sha1);
+
+        if (!isset($sha1FindResult['exists'])) {
+            throw new Exception('Incorrect params, expected "exists" parameter');
+        }
+
+        if ($sha1FindResult['exists']) {
+            $md5 = md5_file($file);
+            $md5FindResult = $this->findByMd5Hash($md5);
+            if (!isset($md5FindResult['exists'])) {
+                throw new Exception('Incorrect params, expectation "exists" parameter');
+            }
+            if ($md5FindResult['exists']) {
+                $createdFile = $this->createFileByHash($md5FindResult['md5'], basename($file));
+                return [
+                    'status' => 'success',
+                    'status_code' => 200,
+                    'user_file_id' => $createdFile['id'],
+                    'link' => $createdFile['link'],
+                ];
+            }
+        }
 
         $data = $this->getUploadFormData($parent_id, $preferred_node);
         if ($data['status'] == 'success') {
@@ -313,17 +345,19 @@ class Keep2ShareAPI
             $postFields = $data['form_data'];
             $postFields[$data['file_field']] = new CURLFile($file);
 
-            curl_setopt_array($curl, array(
+            curl_setopt_array($curl, [
                 CURLOPT_FOLLOWLOCATION => false,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_URL => $data['form_action'],
                 CURLOPT_POST => true,
                 CURLOPT_POSTFIELDS => $postFields,
-            ));
+            ]);
 
             $response = curl_exec($curl);
-            if ($this->verbose) echo '<<', $response, PHP_EOL;
-            return json_decode($response);
+            if ($this->verbose) {
+                echo '<<', $response, PHP_EOL;
+            }
+            return json_decode($response, true);
         } else {
             self::log('Error uploading file : ' . print_r($data, true), 'error');
             return false;
@@ -363,9 +397,9 @@ class Keep2ShareAPI
         ]);
     }
 
-    public static function log($msg, $level = 0)
+    public static function log($msg, $level)
     {
-        echo $msg . PHP_EOL;
+        echo $level . ': ' . $msg . PHP_EOL;
     }
 
     private function setAuthToken($key)
@@ -389,24 +423,13 @@ class Keep2ShareAPI
     }
 
     /**
-     * Return File Link
-     *
-     * @param string $fileID
-     * @return string
-     */
-    private function getLink($fileID = '')
-    {
-        return $this->fileServer . $fileID;
-    }
-
-    /**
      * Get SHA1 by first 5MB of the file
      *
      * @throws Exception
      * @param string $filePath
      * @return string
      */
-    private function getFileSha1Hash($filePath)
+    private function getFirst5MbFileSha1Hash($filePath)
     {
         // Check file for existence
         if (!file_exists($filePath)) {
@@ -457,37 +480,5 @@ class Keep2ShareAPI
         return $this->request('findByFullMd5Hash', [
             'md5' => $md5,
         ]);
-    }
-
-    /**
-     * Upload file method
-     *
-     * @throws Exception
-     * @param string $filePath
-     * @param string $fileName
-     * @return string
-     */
-    public function autoUploader($filePath, $fileName = null)
-    {
-        $sha1 = $this->getFileSha1Hash($filePath);
-        $sha1FindResult = $this->findBySha1Hash($sha1);
-
-        if (!isset($sha1FindResult['found'])) {
-            throw new Exception('Incorrect params, expected "found" parameter');
-        }
-
-        if ($sha1FindResult['found']) {
-            $md5 = md5_file($filePath);
-            $md5FindResult = $this->findByMd5Hash($md5);
-            if (!isset($md5FindResult['found'])) {
-                throw new Exception('Incorrect params, expectation "found" parameter');
-            }
-            if ($md5FindResult['found']) {
-                $createdFile = $this->createFileByHash($md5FindResult['md5'], $fileName ?? basename($filePath));
-                return $this->getLink($createdFile['id']);
-            }
-        }
-        $uploadStatus = $this->uploadFile($filePath);
-        return $uploadStatus->link;
     }
 }
