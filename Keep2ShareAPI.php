@@ -109,7 +109,6 @@ class Keep2ShareAPI
         $response = curl_exec($this->_ch);
 
         if ($this->verbose) {
-            echo 'Call: ', __FUNCTION__, '()', PHP_EOL;
             echo '>> ' . json_encode($params), PHP_EOL;
             echo '<< ' . $response, PHP_EOL;
             echo '-------------------------' . PHP_EOL;
@@ -157,7 +156,7 @@ class Keep2ShareAPI
         $response = curl_exec($this->_ch);
 
         if ($this->verbose) {
-            echo 'Call: ', __FUNCTION__, '()', PHP_EOL;
+            echo "> action: {$action}", PHP_EOL;
             echo '>> ' . json_encode($params), PHP_EOL;
             echo '<< ' . $response, PHP_EOL;
             echo '-------------------------' . PHP_EOL;
@@ -357,7 +356,6 @@ class Keep2ShareAPI
 
             $response = curl_exec($curl);
             if ($this->verbose) {
-                echo 'Call: ', __FUNCTION__, '()', PHP_EOL;
                 echo '<<', $response, PHP_EOL;
             }
             return json_decode($response, true);
