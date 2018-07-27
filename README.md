@@ -188,7 +188,16 @@ DeleteFiles(ids[]) ->
     status_code: [200]
     deleted: int @count of deleted files
 
-
+FindByFullMd5Hash(md5) ->
+    status: [success,error]
+    status_code: [200,400]
+    exists: bool
+    md5: string
+    
+FindByFirst5MbSha1Hash(sha1) ->
+    status: [success,error]
+    status_code: [200,400]
+    exists: bool
 ```
 
 API ERRORS
