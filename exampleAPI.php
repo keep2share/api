@@ -3,7 +3,14 @@
 include "Keep2ShareAPI.php";
 
 $api = new Keep2ShareAPI();
-$api->access_token = 'f6a4a627860a4a1cd0223db141f4e76ead1583af';
+/*
+connect using a username and password
+$api->username='your_email';	
+$api->password='your_password';
+*/
+
+//connect using access_token, add it here https://moneyplatform.biz/token/api.html
+$api->access_token = 'your_access_token';
 
 //getFilesList
 var_dump($api->getFilesList('/', 10, 0, ['date_created'=>-1], 'files'));
