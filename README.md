@@ -82,6 +82,7 @@ GetFilesList(
         is_folder: bool
         date_created: string
         size: int @in bytes
+        md5: string
         extended_info: [
             abuses: []
             storage_object: [available|deleted|corrupted]
@@ -198,6 +199,20 @@ FindByFirst5MbSha1Hash(sha1) ->
     status: [success,error]
     status_code: [200,400]
     exists: bool
+
+GetFileStatus($id, $limit = 100, $offset = 0) ->
+    status: [success,error]
+    status_code: [200,406]
+    errorCode: [not_found,deleted,abused,blocked] @if error
+    files: [
+        id: int
+        name: string
+        is_available: int
+        is_folder: int
+        date_created: string
+        size: float
+        md5: [string,null]
+    ]
 ```
 
 API ERRORS
@@ -241,7 +256,7 @@ API ERRORS
     Additional download errors:
     DOWNLOAD_COUNT_EXCEEDED = 1;     //'Download count files exceed'
     DOWNLOAD_TRAFFIC_EXCEEDED = 2;   //'Traffic limit exceed'
-    DOWNLOAD_FILE_SIZE_EXCEEDED = 3; //"Free user can't download large files. Upgrate to PREMIUM and forget about limits."
+    DOWNLOAD_FILE_SIZE_EXCEEDED = 3; //"Free user can't download large files. Upgrade to PREMIUM and forget about limits."
     DOWNLOAD_NO_ACCESS = 4;          //'You no can access to this file'
     DOWNLOAD_WAITING = 5;            //'Please wait to download this file'
     DOWNLOAD_FREE_THREAD_COUNT_TO_MANY = 6; //'Free account does not allow to download more than one file at the same time'
