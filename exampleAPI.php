@@ -52,7 +52,7 @@ var_dump($api->uploadFile('PATH-TO-LOCAL-FILE'));
   'link' => string 'https://k2s.cc/file/cd4540513fe4d' (length=33)
  */
 
-//Download file
+//Download file from premium account
 var_dump($api->GetUrl('ID-FILE'));
 /*
 array(3) {
@@ -62,5 +62,27 @@ array(3) {
   int(200)
   ["url"]=>
   string(351) "https://prx-128.keep2share.cc/e1079d8df1646/2792f8cb58038/4179479b4....."
+}
+
+error limit exceed
+array(5) {
+ ["message"]=>
+ string(25) "Download is not available"
+ ["status"]=>
+ string(5) "error"
+ ["code"]=>
+ int(406)
+ ["errorCode"]=>
+ int(21)
+ ["errors"]=>
+ array(1) {
+   [0]=>
+   array(2) {
+     ["code"]=>
+     int(2)
+     ["message"]=>
+     string(20) "Traffic limit exceed"
+   }
+ }
 }
 */
