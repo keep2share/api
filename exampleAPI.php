@@ -51,3 +51,16 @@ var_dump($api->uploadFile('PATH-TO-LOCAL-FILE'));
   'user_file_id' => string 'cd4540513fe4d' (length=13)
   'link' => string 'https://k2s.cc/file/cd4540513fe4d' (length=33)
  */
+
+//Download file
+var_dump($api->GetUrl('ID-FILE'));
+/*
+array(3) {
+  ["status"]=>
+  string(7) "success"
+  ["code"]=>
+  int(200)
+  ["url"]=>
+  string(351) "https://prx-128.keep2share.cc/e1079d8df1646/2792f8cb58038/4179479b4....."
+}
+*/
