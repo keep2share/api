@@ -482,4 +482,19 @@ class Keep2ShareAPI
             'md5' => $md5,
         ]);
     }
+
+    /**
+     * @param int $id
+     * @param int $limit Only for folders
+     * @param int $offset Only for folders
+     * @return array
+     */
+    public function getFileStatus($id, $limit = 100, $offset = 0)
+    {
+        return $this->request('GetFileStatus', [
+            'id' => $id,
+            'limit' => $limit,
+            'offset' => $offset,
+        ]);
+    }
 }
