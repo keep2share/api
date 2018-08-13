@@ -329,7 +329,7 @@ class Keep2ShareAPI
                 throw new Exception('Incorrect params, expectation "exists" parameter');
             }
             if ($md5FindResult['exists']) {
-                $createdFile = $this->createFileByHash($md5FindResult['md5'], basename($file));
+                $createdFile = $this->createFileByHash($md5FindResult['md5'], basename($file), $parent_id);
                 return [
                     'status' => 'success',
                     'status_code' => 200,
