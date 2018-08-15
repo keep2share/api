@@ -167,7 +167,7 @@ FindFile(md5)
     found: bool
 
 
-CreateFileByHash(hash, name, parent = '/', access = public) ->
+CreateFileByHash(hash, name, parent = null, access = public) ->
     status: [success, error]
     status_code: [201,400,406]
     id: int @if created new file
