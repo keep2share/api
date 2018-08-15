@@ -281,7 +281,7 @@ class Keep2ShareAPI
         ));
     }
 
-    public function createFileByHash($md5, $name, $parent = '/', $access = Keep2ShareAPI::FILE_ACCESS_PUBLIC)
+    public function createFileByHash($md5, $name, $parent = null, $access = Keep2ShareAPI::FILE_ACCESS_PUBLIC)
     {
         return $this->request('createFileByHash', array(
             'hash' => $md5,
