@@ -46,8 +46,18 @@ RequestCaptcha() ->
     status_code: [200,406]
     challenge: string
     captcha_url: string
+```
 
-GetUrl(file_id, free_download_key = null, captcha_challenge = null, captcha_response = null) ->
+The `GetUrl` method uses the required parameters `captcha_challenge` and `captcha_response`.
+To obtain these parameters, use the `RequestCaptha` method.
+```
+GetUrl(
+    file_id,
+    free_download_key = null,
+    captcha_challenge = null,
+    captcha_response = null,
+    url_referrer = null
+) ->
     status: [success, fail]
     status_code: [200,400,406]
     url: string
