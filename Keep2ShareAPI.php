@@ -160,7 +160,7 @@ class Keep2ShareAPI
             echo '>> ' . json_encode($params), PHP_EOL;
             echo '<< ' . $response, PHP_EOL;
             echo '-------------------------' . PHP_EOL;
-        }
+        } 
 
         $data = json_decode($response, true);
         if ($data['status'] == 'error' && isset($data['code']) && $data['code'] == 403) {
