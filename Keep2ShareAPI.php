@@ -1,5 +1,7 @@
 <?php
 
+include 'Keep2ShareApiV2.php';
+
 /**
  * Class Keep2ShareAPI
  *
@@ -66,6 +68,8 @@ class Keep2ShareAPI
     public $access_token;
     public $verbose = false;
 
+    protected $_apiClient;
+
     /**
      * Keep2ShareAPI constructor.
      *
@@ -83,6 +87,13 @@ class Keep2ShareAPI
         curl_setopt($this->_ch, CURLOPT_FOLLOWLOCATION, 2);
 
         $this->_auth_token = $this->getAuthToken();
+
+        $this->_apiClient = new Keep2ShareApiV2();
+        try {
+            $this->_apiClient->authenticateByClient();
+        } catch (Exception $e) {
+            self::log('Failed client token fetching', 'error');
+        }
     }
 
     /**
@@ -92,41 +103,16 @@ class Keep2ShareAPI
      */
     public function login($captcha_challenge = null, $captcha_response = null)
     {
-        curl_setopt($this->_ch, CURLOPT_URL, $this->baseUrl . 'login');
-
-        $params = [
-            'username' => $this->username,
-            'password' => $this->password,
-        ];
-
-        if ($captcha_challenge)
-            $params['captcha_challenge'] = $captcha_challenge;
-
-        if ($captcha_response)
-            $params['captcha_response'] = $captcha_response;
-
-        curl_setopt($this->_ch, CURLOPT_POSTFIELDS, json_encode($params));
-        $response = curl_exec($this->_ch);
-
-        if ($this->verbose) {
-            echo '>> ' . json_encode($params), PHP_EOL;
-            echo '<< ' . $response, PHP_EOL;
-            echo '-------------------------' . PHP_EOL;
-        }
-        $data = json_decode($response, true);
-
-        if (!$data || !isset($data['status'])) {
-            self::log('Authentication failed', 'warning');
+        try {
+            return $this->_apiClient->authenticateByPassword(
+                $this->username,
+                $this->password,
+                $captcha_challenge,
+                $captcha_response
+            );
+        } catch (Exception $e) {
+            self::log("Authentication failed: {$e->getMessage()}", 'warning');
             return false;
-        }
-
-        if ($data['status'] == 'success') {
-            $this->setAuthToken($data['auth_token']);
-            $this->_auth_token = $data['auth_token'];
-            return true;
-        } else {
-            self::log('Authentication failed: ' . $data['message'], 'warning');
-            return $data['errorCode'];
         }
     }
 
@@ -160,7 +146,7 @@ class Keep2ShareAPI
             echo '>> ' . json_encode($params), PHP_EOL;
             echo '<< ' . $response, PHP_EOL;
             echo '-------------------------' . PHP_EOL;
-        } 
+        }
 
         $data = json_decode($response, true);
         if ($data['status'] == 'error' && isset($data['code']) && $data['code'] == 403) {
