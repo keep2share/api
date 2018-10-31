@@ -17,7 +17,7 @@ HTTP CODES
 METHODS
 
 ```
-Login (username, password, captcha_challenge = null, captcha_response = null) ->
+Login (username, password, captcha_challenge = null, captcha_response = null, re_captcha_challenge = null, re_captcha_response = null) ->
     status_code: [success, fail]
     code: [200, 400, 403, 406]
     auth_token: string
@@ -42,6 +42,12 @@ Test() ->
 
 
 RequestCaptcha() ->
+    status: [success, fail]
+    status_code: [200,406]
+    challenge: string
+    captcha_url: string
+    
+RequestReCaptcha() ->
     status: [success, fail]
     status_code: [200,406]
     challenge: string
@@ -237,6 +243,7 @@ API ERRORS
 
     ERROR_CAPTCHA_REQUIRED = 30;
     ERROR_CAPTCHA_INVALID = 31;
+    const ERROR_RE_CAPTCHA_REQUIRED = 33;
 
     ERROR_WRONG_FREE_DOWNLOAD_KEY = 40;
     ERROR_NEED_WAIT_TO_FREE_DOWNLOAD = 41;

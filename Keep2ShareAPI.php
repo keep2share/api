@@ -21,6 +21,7 @@ class Keep2ShareAPI
 
     const ERROR_CAPTCHA_REQUIRED = 30;
     const ERROR_CAPTCHA_INVALID = 31;
+    const ERROR_RE_CAPTCHA_REQUIRED = 33;
 
     const ERROR_WRONG_FREE_DOWNLOAD_KEY = 40;
     const ERROR_NEED_WAIT_TO_FREE_DOWNLOAD = 41;
@@ -88,9 +89,11 @@ class Keep2ShareAPI
     /**
      * @param null $captcha_challenge
      * @param null $captcha_response
+     * @param null $re_captcha_challenge
+     * @param null $re_captcha_response
      * @return bool|int True if success login or error code
      */
-    public function login($captcha_challenge = null, $captcha_response = null)
+    public function login($captcha_challenge = null, $captcha_response = null, $re_captcha_challenge = null, $re_captcha_response = null)
     {
         curl_setopt($this->_ch, CURLOPT_URL, $this->baseUrl . 'login');
 
@@ -104,6 +107,12 @@ class Keep2ShareAPI
 
         if ($captcha_response)
             $params['captcha_response'] = $captcha_response;
+
+        if ($re_captcha_challenge)
+            $params['re_captcha_challenge'] = $re_captcha_challenge;
+
+        if ($re_captcha_response)
+            $params['re_captcha_response'] = $re_captcha_response;
 
         curl_setopt($this->_ch, CURLOPT_POSTFIELDS, json_encode($params));
         $response = curl_exec($this->_ch);
