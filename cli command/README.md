@@ -16,7 +16,12 @@ USAGE
   $ partnercli upload
 
 OPTIONS
+
   -a, --access-token=access-token              (required) access token from your profile
+  
   -c, --path-to-csv=path-to-csv                [default: upload_log.csv] local path to generated result file
+  
   -d, --destination-folder=destination-folder  folder Id on server
+  
   -s, --source-folder=source-folder            (required) path to local folder
+  
