@@ -7,6 +7,7 @@ There are things it can do for you:
 
 CLI command checks the hash of file before uploading.
 
+
 Examples:
 
 $ ./partnercli-macos help upload
