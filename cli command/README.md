@@ -1,6 +1,10 @@
-# CLI command v.1.1.4
+# CLI command v.1.1.5
 
-The latest version
+The latest version.
+
+Fixed some bugs.
+
+# CLI command v.1.1.4
 
 ## USAGE
     $ partnercli upload
