@@ -174,6 +174,7 @@ RemoteUploadStatus(ids[])
     uploads: [
         status: int @[1: new, 2: processing, 3: completed, 4:error, 5: accepted]
         progress: int @percents
+        file_id: [string,null]
     ]
 
 
