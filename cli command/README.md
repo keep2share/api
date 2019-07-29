@@ -1,6 +1,11 @@
-# CLI command v.1.3.7
+# CLI command v.1.3.9
 
-Latest version.
+The latest version.
+
+* We added loader while file uploading to the server.
+* Fixed some bugs.
+
+# CLI command v.1.3.7
 
 * We added `-n` parameter. You can specify the project and get the appropriate domain for links.
 * We improved an uploading files speed.
