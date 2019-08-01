@@ -24,10 +24,10 @@ Login (username, password, captcha_challenge = null, captcha_response = null, re
     auth_token: string
 ```
 
+Example
 ```bash
-For example:
-    request:  curl -d '{"username":"yourbox@gmail.com","password":"yourpassword"}' http://keep2share.cc/api/v2/login
-    response: {"status":"success","code":200,"auth_token":"mt2dr45tlnevrjemsq34gnu121"}
+request:  curl -d '{"username":"yourbox@gmail.com","password":"yourpassword"}' http://keep2share.cc/api/v2/login
+response: {"status":"success","code":200,"auth_token":"mt2dr45tlnevrjemsq34gnu121"}
 ```
 You must add the `auth_token` to all request methods.
 
@@ -42,13 +42,13 @@ Test() ->
     message: string
 ```
 
+Example
 ```bash
-For example:
-    request:  curl -d '{"auth_token":"mt2dr45tlnevrjemsq34gnu121"}' http://keep2share.cc/api/v2/test
-    response: {"status":"success","code":200,"message":"Test was successful!"}
+request:  curl -d '{"auth_token":"mt2dr45tlnevrjemsq34gnu121"}' http://keep2share.cc/api/v2/test
+response: {"status":"success","code":200,"message":"Test was successful!"}
 
-    request:  curl -d '{"auth_token":"---wrong_token----"}' http://keep2share.cc/api/v2/test
-    response: {"status":"error","code":403,"message":"Authorization session was expired"}
+request:  curl -d '{"auth_token":"---wrong_token----"}' http://keep2share.cc/api/v2/test
+response: {"status":"error","code":403,"message":"Authorization session was expired"}
 ```
 
 ### RequestCaptcha
