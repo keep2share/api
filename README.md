@@ -1,10 +1,10 @@
 API base url: http://keep2share.cc/api/v2
 
 
-All request parameters must be encoded to JSON and sent using the POST method
-All methods return operation status (success, fail) and additional data in JSON
+All request parameters must be encoded to JSON and sent using the POST method.
+All methods return operation status (success, fail) and additional data in JSON.
 
-HTTP CODES
+# HTTP CODES
 ```
 2xx - Request successful
 400 - Bad request (not correct request params)
@@ -14,39 +14,54 @@ HTTP CODES
 ```
 
 
-METHODS
+# METHODS
 
+### Login
 ```
 Login (username, password, captcha_challenge = null, captcha_response = null, re_captcha_challenge = null, re_captcha_response = null) ->
     status_code: [success, fail]
     code: [200, 400, 403, 406]
     auth_token: string
+```
 
-    For example:
-        request:  curl -d '{"username":"yourbox@gmail.com","password":"yourpassword"}' http://keep2share.cc/api/v2/login
-        response: {"status":"success","code":200,"auth_token":"mt2dr45tlnevrjemsq34gnu121"}
+```bash
+For example:
+    request:  curl -d '{"username":"yourbox@gmail.com","password":"yourpassword"}' http://keep2share.cc/api/v2/login
+    response: {"status":"success","code":200,"auth_token":"mt2dr45tlnevrjemsq34gnu121"}
+```
+You must add the `auth_token` to all request methods.
 
-    auth_token must be added as param for all request methods
+If you have a partner account you can set `access_token` parameter while running any methods from this API.
+You can find the `access_token` on the `Tools -> API` page.
 
+### Test
+```
 Test() ->
     status: [success, fail]
     status_code: [200,406]
     message: string
+```
 
-    For example:
-        request:  curl -d '{"auth_token":"mt2dr45tlnevrjemsq34gnu121"}' http://keep2share.cc/api/v2/test
-        response: {"status":"success","code":200,"message":"Test was successful!"}
+```bash
+For example:
+    request:  curl -d '{"auth_token":"mt2dr45tlnevrjemsq34gnu121"}' http://keep2share.cc/api/v2/test
+    response: {"status":"success","code":200,"message":"Test was successful!"}
 
-        request:  curl -d '{"auth_token":"---wrong_token----"}' http://keep2share.cc/api/v2/test
-        response: {"status":"error","code":403,"message":"Authorization session was expired"}
+    request:  curl -d '{"auth_token":"---wrong_token----"}' http://keep2share.cc/api/v2/test
+    response: {"status":"error","code":403,"message":"Authorization session was expired"}
+```
 
-
+### RequestCaptcha
+```
 RequestCaptcha() ->
     status: [success, fail]
     status_code: [200,406]
     challenge: string
     captcha_url: string
-    
+```
+
+### RequestReCaptcha
+```
 RequestReCaptcha() ->
     status: [success, fail]
     status_code: [200,406]
@@ -54,6 +69,7 @@ RequestReCaptcha() ->
     captcha_url: string
 ```
 
+### GetUrl
 The `GetUrl` method uses the required parameters `captcha_challenge` and `captcha_response`.
 To obtain these parameters, use the `RequestCaptha` method.
 ```
@@ -69,24 +85,32 @@ GetUrl(
     url: string
     free_download_key: string
     time_wait: string
+```
 
+### AccountInfo
+```
 AccountInfo() ->
     status: [success]
     status_code: [200]
     available_traffic: int64 [in bytes]
     account_expires: int [timestamp]
+```
 
+### ResellerGetCode
+```
 ResellerGetCode(days, useExist = true, autoBuy = true) ->
     status: [success, fail]
     status_code: [200,400,406]
     code_id: int
     reseller_code: string
     balance: float
+```
 
-
+### GetFilesList
+```
 GetFilesList(
-    parent = '/', limit = 100, offset = 0, sort = [id=>[-1,1], 
-    name=>[-1,1], date_created=>[-1,1]], type=>[any,file,folder], 
+    parent = '/', limit = 100, offset = 0, sort = [id=>[-1,1],
+    name=>[-1,1], date_created=>[-1,1]], type=>[any,file,folder],
     only_available = false, extended_info = false
 ) ->
     status: [success, fail]
@@ -111,18 +135,25 @@ GetFilesList(
     ]
  sort by id=-1 - DESC
  sort by id=1 - ASC
+```
 
-
+### CreateFolder
+```
 CreateFolder(name, parent ['/' or parent_id], access [public, private, premium], is_public = false) ->
     status: [success, fail]
     status_code: [201,400,406]
     id: int @id new folder
+```
 
-
+### UpdateFile
+```
 UpdateFile(id, new_name = null, new_parent = null, new_access = null, new_is_public = null) ->
     status: [success, fail]
     status_code: [202,400,406]
+```
 
+### UpdateFiles
+```
 UpdateFiles(ids[], new_name = null, new_parent = null, new_access = null, new_is_public = null) ->
     status: [success]
     status_code: [200]
@@ -131,13 +162,18 @@ UpdateFiles(ids[], new_name = null, new_parent = null, new_access = null, new_is
         status: [success, error]
         errors: [] @if error
     ]
+```
 
+### GetBalance
+```
 GetBalance() ->
     status: [success]
     status_code: [200]
     balance: float
+```
 
-
+### GetFilesInfo
+```
 GetFilesInfo(ids[], extended_info = false) ->
     status: [success]
     status_code: [200,400]
@@ -159,15 +195,19 @@ GetFilesInfo(ids[], extended_info = false) ->
             content_type: string
         ]
     ]
+```
 
-
+### RemoteUploadAdd
+```
 RemoteUploadAdd(urls[]) ->
     status: [success]
     status_code: [200,400]
     acceptedUrls: []
     rejectedUrls: []
+```
 
-
+### RemoteUploadStatus
+```
 RemoteUploadStatus(ids[])
     status: [success]
     status_code: [200,400]
@@ -176,21 +216,27 @@ RemoteUploadStatus(ids[])
         progress: int @percents
         file_id: [string,null]
     ]
+```
 
-
+### FindFile
+```
 FindFile(md5)
     status: [success]
     status_code: [200,400]
     found: bool
+```
 
-
+### CreateFileByHash
+```
 CreateFileByHash(hash, name, parent = null, access = public) ->
     status: [success, error]
     status_code: [201,400,406]
     id: int @if created new file
     errors: [] @if error
+```
 
-
+### GetUploadFormData
+```
 GetUploadFormData(parent_id = null, preferred_node = null) ->
     status: [success]
     status_code: [200,400]
@@ -200,23 +246,35 @@ GetUploadFormData(parent_id = null, preferred_node = null) ->
         params: string
         signature: string
     ]
+```
 
+### DeleteFiles
+```
 DeleteFiles(ids[]) ->
     status: [success]
     status_code: [200]
     deleted: int @count of deleted files
+```
 
+### FindByFullMd5Hash
+```
 FindByFullMd5Hash(md5) ->
     status: [success,error]
     status_code: [200,400]
     exists: bool
     md5: string
-    
+```
+
+### FindByFirst5MbSha1Hash
+```
 FindByFirst5MbSha1Hash(sha1) ->
     status: [success,error]
     status_code: [200,400]
     exists: bool
+```
 
+### GetFileStatus
+```
 GetFileStatus($id, $limit = 100, $offset = 0) ->
     status: [success,error]
     status_code: [200,406]
@@ -232,8 +290,24 @@ GetFileStatus($id, $limit = 100, $offset = 0) ->
     ]
 ```
 
-API ERRORS
+### GetDomainsList
 ```
+GetDomainsList() ->
+    status: [success, error]
+    status_code: [200,400]
+    domains: [string]
+```
+
+### GetFolderList
+```
+GetFoldersList() ->
+    status: [success, error]
+    code: [200,400]
+    foldersList: [string]
+```
+
+# API ERRORS
+```ini
     ERROR_INCORRECT_PARAM_VALUE = 3;
 
     ERROR_YOU_ARE_NEED_AUTHORIZED = 10;
