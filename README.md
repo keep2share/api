@@ -304,6 +304,7 @@ GetFoldersList() ->
     status: [success, error]
     code: [200,400]
     foldersList: [string]
+    foldersIds: [string]
 ```
 
 # API ERRORS
