@@ -61,7 +61,7 @@ class Keep2ShareAPI
     protected $_ch;
     protected $_auth_token;
     protected $_allowAuth = true;
-    public $baseUrl = 'http://keep2share.cc/api/v2/';
+    public $baseUrl = 'https://keep2share.cc/api/v2/';
     public $username;
     public $password;
     public $access_token;
