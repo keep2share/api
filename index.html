@@ -2438,7 +2438,7 @@ $getBalance = $api-&gt;getBalance();
                                         <td class="table__col--type">string</td>
                                         <td class="table__col--description property__info">
                                             <div class="property__description rtc rtc--final"><p>example: <a
-                                                    href="mailto:&#116;&#x65;&#115;&#x74;&#x40;&#x74;&#x65;&#x73;&#116;&#x2e;&#116;&#101;&#x73;&#116;">&#116;&#x65;&#115;&#x74;&#x40;&#x74;&#x65;&#x73;&#116;&#x2e;&#116;&#101;&#x73;&#116;</a>
+                                                    href="mailto:&#x74;&#x65;&#115;&#x74;&#64;&#x74;&#x65;&#115;&#116;&#x2e;&#x74;&#101;&#x73;&#x74;">&#x74;&#x65;&#115;&#x74;&#64;&#x74;&#x65;&#115;&#116;&#x2e;&#x74;&#101;&#x73;&#x74;</a>
                                             </p></div>
                                         </td>
                                     </tr>
@@ -5885,7 +5885,8 @@ $getBalance = $api-&gt;getBalance();
                                     <tbody class="table__body table__body--type">
                                     <tr class="property">
                                         <th class="table__col--name"><span class="property__prefix"></span><span
-                                                class="property__name">auth_token</span></th>
+                                                class="property__name">auth_token</span><span
+                                                class="property__required">*</span></th>
                                         <td class="table__col--type">string</td>
                                         <td class="table__col--description property__info">
                                             <div class="property__description rtc rtc--final"><p>example:
@@ -5907,15 +5908,41 @@ $getBalance = $api-&gt;getBalance();
                                                 class="property__name">extended_info</span></th>
                                         <td class="table__col--type">boolean</td>
                                         <td class="table__col--description property__info">
-                                            <div class="property__description rtc rtc--final"><p>default false</p>
+                                            <div class="property__description rtc rtc--final">
                                                 <ul>
-                                                    <li>abuses</li>
                                                     <li>storage_object</li>
                                                     <li>size</li>
-                                                    <li>date_download_last</li>
-                                                    <li>downloads</li>
                                                     <li>access</li>
                                                     <li>content_type</li>
+                                                    <li>video_info</li>
+                                                    <li>
+                                                        <ul>
+                                                            <li>duration</li>
+                                                        </ul>
+                                                    </li>
+                                                    <li>
+                                                        <ul>
+                                                            <li>width</li>
+                                                        </ul>
+                                                    </li>
+                                                    <li>
+                                                        <ul>
+                                                            <li>height</li>
+                                                        </ul>
+                                                    </li>
+                                                    <li>
+                                                        <ul>
+                                                            <li>format</li>
+                                                        </ul>
+                                                    </li>
+                                                    <li>
+                                                        <ul>
+                                                            <li>is_streamable</li>
+                                                        </ul>
+                                                    </li>
+                                                    <li>downloads</li>
+                                                    <li>date_download_last</li>
+                                                    <li>created_at</li>
                                                 </ul>
                                             </div>
                                         </td>
@@ -6002,32 +6029,38 @@ $getBalance = $api-&gt;getBalance();
                                 <div class="type__sidecode">
                                     <div class="container--inner"><h3 class="sidecode__title">Response Body</h3>
                                         <pre class="code-example"><code class="hljs json">{
-   "status":"success",
-   "code":200,
-   "files": [
-      {
-         "id":"4632a04bb0d2b",
-         "name":"test",
-         "is_available":false,
-         "is_folder":false,
-         "date_created":"2019-01-01 00:00:01",
-         "size":1024,
-         "md5":"a457f1dd3623a399d78a9672d225ddd5",
-         "extended_info": {
-             "abuses":[{
-                "type": "hash",
-                "projects": ["k2s"],
-                "blocked_to": "2020-01-01 00:00:01"
-             }],
-             "storage_object":"available",
-             "size":1024,
-             "date_download_last":"2019-01-01 00:00:01",
-             "downloads":1,
-             "access":"public",
-             "content_type":"text"
-         }
-      }
-   ]
+  "status": "success",
+  "code": 200,
+  "files": [
+    {
+      "id": "er19845b064",
+      "name": "video.mp4",
+      "size": 15305818,
+      "is_available": true,
+      "access": "public",
+      "is_folder": false,
+      "md5": "202cb962ac59075b964b07152d234b70",
+      "isAvailableForFree": true,
+      "parent_id": null,
+      "extended_info": {
+        "storage_object": "available",
+        "size": 15305818,
+        "access": "public",
+        "content_type": "video/mp4",
+        "video_info": {
+          "duration": 69.779,
+          "width": 640,
+          "height": 352,
+          "format": "MPEG-4",
+          "is_streamable": true
+        },
+        "downloads": 1,
+        "date_download_last": "2019-03-26 08:21:45"
+      },
+      "created_at": "2019-03-26T08:09:32.000Z"
+    }
+  ]
+}
 </code></pre>
                                     </div>
                                 </div>
