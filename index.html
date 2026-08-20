@@ -2498,7 +2498,7 @@ $getBalance = $api-&gt;getBalance();
                                         <td class="table__col--type">string</td>
                                         <td class="table__col--description property__info">
                                             <div class="property__description rtc rtc--final"><p>example: <a
-                                                    href="mailto:&#116;&#x65;&#x73;&#116;&#x40;&#x74;&#x65;&#x73;&#116;&#x2e;&#116;&#x65;&#115;&#x74;">&#116;&#x65;&#x73;&#116;&#x40;&#x74;&#x65;&#x73;&#116;&#x2e;&#116;&#x65;&#115;&#x74;</a>
+                                                    href="mailto:&#x74;&#x65;&#x73;&#116;&#64;&#116;&#x65;&#x73;&#x74;&#46;&#x74;&#101;&#x73;&#116;">&#x74;&#x65;&#x73;&#116;&#64;&#116;&#x65;&#x73;&#x74;&#46;&#x74;&#101;&#x73;&#116;</a>
                                             </p></div>
                                         </td>
                                     </tr>
@@ -5450,8 +5450,8 @@ $getBalance = $api-&gt;getBalance();
                     <div class="section">
                         <div class="section__content container container--inner">
                             <div class="content-group">
-                                <div class="rtc rtc--final"><p>This method allows you to recieve File list by its ID or
-                                    from root folder in user space.</p></div>
+                                <div class="rtc rtc--final"><p>This method allows to retrieve a list of file IDs from
+                                    the root folder or another folder specified in the parent parameter.</p></div>
                             </div>
                             <div class="content-group collapsible--collapsed"
                                  id="resources:/getFilesList:post:secured-by"><h3
@@ -7397,7 +7397,9 @@ $getBalance = $api-&gt;getBalance();
                         <div class="section__content container container--inner">
                             <div class="content-group">
                                 <div class="rtc rtc--final"><p>This method allows to check file presence in our cloud
-                                    storage using hash sum (md5).</p></div>
+                                    storage using hash sum (md5).</p>
+                                    <p>Pass <code>extended_info: true</code> to also get a <code>files</code> array with
+                                        detailed information about each matching file.</p></div>
                             </div>
                             <div class="content-group collapsible--collapsed" id="resources:/findFile:post:secured-by">
                                 <h3 class="content-group__title collapsible__toggler collapsible__head"
@@ -7481,6 +7483,17 @@ $getBalance = $api-&gt;getBalance();
                                             </div>
                                         </td>
                                     </tr>
+                                    <tr class="property">
+                                        <th class="table__col--name"><span class="property__prefix"></span><span
+                                                class="property__name">extended_info</span></th>
+                                        <td class="table__col--type">boolean</td>
+                                        <td class="table__col--description property__info">
+                                            <div class="property__description rtc rtc--final"><p>If true and a file with
+                                                the given md5 is found, the response also includes a <code>files</code>
+                                                array with detailed information about each matching file. example: true
+                                            </p></div>
+                                        </td>
+                                    </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -7489,7 +7502,8 @@ $getBalance = $api-&gt;getBalance();
                                     <div class="container--inner"><h3 class="sidecode__title">Request Body</h3>
                                         <pre class="code-example"><code class="hljs json">{
     "auth_token":"cb9tg4rt9lom9gb5i6tudgqlse",
-    "md5":"a457f1dd3623a399d78a9672d225ddd1"
+    "md5":"a457f1dd3623a399d78a9672d225ddd1",
+    "extended_info":true
 }
 </code></pre>
                                     </div>
@@ -7555,16 +7569,174 @@ $getBalance = $api-&gt;getBalance();
                                         <td class="table__col--type">boolean</td>
                                         <td class="table__col--description property__info"></td>
                                     </tr>
+                                    <tr class="property">
+                                        <th class="table__col--name"><span class="property__prefix"></span><span
+                                                class="property__name">files</span></th>
+                                        <td class="table__col--type">array</td>
+                                        <td class="table__col--description property__info">
+                                            <div class="property__description rtc rtc--final"><p>present only when
+                                                extended_info is true and matching files were found</p></div>
+                                        </td>
+                                    </tr>
+                                    <tr class="property">
+                                        <th class="table__col--name"><span class="property__prefix">files</span><span
+                                                class="property__name">[]</span></th>
+                                        <td class="table__col--type">object</td>
+                                        <td class="table__col--description property__info"></td>
+                                    </tr>
+                                    <tr class="property">
+                                        <th class="table__col--name"><span class="property__prefix">files[].</span><span
+                                                class="property__name">id</span><span
+                                                class="property__required">*</span></th>
+                                        <td class="table__col--type">string</td>
+                                        <td class="table__col--description property__info"></td>
+                                    </tr>
+                                    <tr class="property">
+                                        <th class="table__col--name"><span class="property__prefix">files[].</span><span
+                                                class="property__name">name</span><span
+                                                class="property__required">*</span></th>
+                                        <td class="table__col--type">string</td>
+                                        <td class="table__col--description property__info"></td>
+                                    </tr>
+                                    <tr class="property">
+                                        <th class="table__col--name"><span class="property__prefix">files[].</span><span
+                                                class="property__name">size</span><span
+                                                class="property__required">*</span></th>
+                                        <td class="table__col--type">integer</td>
+                                        <td class="table__col--description property__info"></td>
+                                    </tr>
+                                    <tr class="property">
+                                        <th class="table__col--name"><span class="property__prefix">files[].</span><span
+                                                class="property__name">is_available</span><span
+                                                class="property__required">*</span></th>
+                                        <td class="table__col--type">boolean</td>
+                                        <td class="table__col--description property__info"></td>
+                                    </tr>
+                                    <tr class="property">
+                                        <th class="table__col--name"><span class="property__prefix">files[].</span><span
+                                                class="property__name">access</span><span
+                                                class="property__required">*</span></th>
+                                        <td class="table__col--type">string</td>
+                                        <td class="table__col--description property__info">
+                                            <div class="property__attr"><span class="property__attr__label">Enum:</span>
+                                                <ul class="property__attr__val property__attr__val--list">
+                                                    <li class="property__attr__val property__attr__val--pre">public</li>
+                                                    <li class="property__attr__val property__attr__val--pre">private
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="property">
+                                        <th class="table__col--name"><span class="property__prefix">files[].</span><span
+                                                class="property__name">md5</span><span
+                                                class="property__required">*</span></th>
+                                        <td class="table__col--type">string</td>
+                                        <td class="table__col--description property__info"></td>
+                                    </tr>
+                                    <tr class="property">
+                                        <th class="table__col--name"><span class="property__prefix">files[].</span><span
+                                                class="property__name">isAvailableForFree</span><span
+                                                class="property__required">*</span></th>
+                                        <td class="table__col--type">boolean</td>
+                                        <td class="table__col--description property__info"></td>
+                                    </tr>
+                                    <tr class="property">
+                                        <th class="table__col--name"><span class="property__prefix">files[].</span><span
+                                                class="property__name">parent_id</span></th>
+                                        <td class="table__col--type">string</td>
+                                        <td class="table__col--description property__info"></td>
+                                    </tr>
+                                    <tr class="property">
+                                        <th class="table__col--name"><span class="property__prefix">files[].</span><span
+                                                class="property__name">created_at</span><span
+                                                class="property__required">*</span></th>
+                                        <td class="table__col--type">datetime</td>
+                                        <td class="table__col--description property__info"></td>
+                                    </tr>
+                                    <tr class="property">
+                                        <th class="table__col--name"><span class="property__prefix">files[].</span><span
+                                                class="property__name">date_download_last</span></th>
+                                        <td class="table__col--type">string</td>
+                                        <td class="table__col--description property__info"></td>
+                                    </tr>
+                                    <tr class="property">
+                                        <th class="table__col--name"><span class="property__prefix">files[].</span><span
+                                                class="property__name">abuses</span></th>
+                                        <td class="table__col--type">array</td>
+                                        <td class="table__col--description property__info"></td>
+                                    </tr>
+                                    <tr class="property">
+                                        <th class="table__col--name"><span
+                                                class="property__prefix">files[].abuses</span><span
+                                                class="property__name">[]</span></th>
+                                        <td class="table__col--type">object</td>
+                                        <td class="table__col--description property__info"></td>
+                                    </tr>
+                                    <tr class="property">
+                                        <th class="table__col--name"><span
+                                                class="property__prefix">files[].abuses[].</span><span
+                                                class="property__name">type</span><span
+                                                class="property__required">*</span></th>
+                                        <td class="table__col--type">string</td>
+                                        <td class="table__col--description property__info"></td>
+                                    </tr>
+                                    <tr class="property">
+                                        <th class="table__col--name"><span
+                                                class="property__prefix">files[].abuses[].</span><span
+                                                class="property__name">projects</span></th>
+                                        <td class="table__col--type">array</td>
+                                        <td class="table__col--description property__info"></td>
+                                    </tr>
+                                    <tr class="property">
+                                        <th class="table__col--name"><span class="property__prefix">files[].abuses[].projects</span><span
+                                                class="property__name">[]</span></th>
+                                        <td class="table__col--type">string</td>
+                                        <td class="table__col--description property__info"></td>
+                                    </tr>
+                                    <tr class="property">
+                                        <th class="table__col--name"><span
+                                                class="property__prefix">files[].abuses[].</span><span
+                                                class="property__name">blocked_to</span></th>
+                                        <td class="table__col--type">string</td>
+                                        <td class="table__col--description property__info"></td>
+                                    </tr>
                                     </tbody>
                                 </table>
                             </div>
                             <div class="section__sidecode">
                                 <div class="type__sidecode">
-                                    <div class="container--inner"><h3 class="sidecode__title">Response Body</h3>
+                                    <div class="container--inner"><h3 class="sidecode__title">Response Body</h3><h4
+                                            class="sidecode__subtitle">without extended info</h4>
+                                        <p class="sidecode__description sidecode__space--small">Response without
+                                            extended_info</p>
                                         <pre class="code-example"><code class="hljs json">{
     "status":"success",
     "code":200,
     "found":true
+}
+</code></pre>
+                                        <h4 class="sidecode__subtitle">with extended info</h4>
+                                        <p class="sidecode__description sidecode__space--small">Response with
+                                            extended_info</p>
+                                        <pre class="code-example"><code class="hljs json">{
+    "status":"success",
+    "code":200,
+    "found":true,
+    "files":[
+        {
+            "id":"da4a6352cb666",
+            "name":"Super video.mp4",
+            "size":479125093,
+            "is_available":true,
+            "access":"public",
+            "md5":"a457f1dd3623a399d78a9672d225ddd1",
+            "isAvailableForFree":true,
+            "parent_id":"6715a7cde4e55",
+            "created_at":"2022-11-19T12:52:20.000Z",
+            "date_download_last":"2022-12-17 10:14:11"
+        }
+    ]
 }
 </code></pre>
                                     </div>
